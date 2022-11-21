@@ -4,9 +4,7 @@ import { useParams } from "react-router";
 import { API } from "../api";
 
 export const Detail = () => {
-  const [data, isLoading, error, _, setSearchValue] = useFetchData(
-    API.getDetail
-  );
+  const [data, isLoading, error, setSearchValue] = useFetchData(API.getDetail);
 
   const currentData = data as RepoType;
 

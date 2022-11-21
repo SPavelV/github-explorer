@@ -46,5 +46,5 @@ export const useFetchData = (
     return () => (isSubscribed = false);
   }, [searchValue, apiMethod]);
 
-  return [data, isLoading, error, searchValue, setSearchValue];
+  return [data, isLoading, error, setSearchValue];
 };

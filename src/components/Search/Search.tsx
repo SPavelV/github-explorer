@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import styled from "styled-components";
+import { useSearchParams } from "react-router-dom";
 
 const Label = styled.label`
   display: block;
@@ -18,16 +19,22 @@ const LabelText = styled.div`
   margin-bottom: 8px;
 `;
 
-type SearchProps = {
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  value: string;
-};
+export const Search: FC = () => {
+  const [searchParams, setSearchparams] = useSearchParams();
 
-export const Search: FC<SearchProps> = ({ onChange, value = "" }) => {
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchparams({
+      repoName: e.target.value,
+    });
+  };
   return (
     <Label>
       <LabelText>Введите название репозитория</LabelText>
-      <StyledInput type="text" value={value} onChange={onChange} />
+      <StyledInput
+        type="text"
+        value={searchParams.get("repoName") || ""}
+        onChange={changeHandler}
+      />
     </Label>
   );
 };
