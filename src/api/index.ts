@@ -37,8 +37,6 @@ export const API = {
         }),
       ]);
 
-      console.log("readme", readme);
-      console.log("langs", langs);
       return { langs, readme: readme };
     } catch (error) {
       if (error instanceof Error) {

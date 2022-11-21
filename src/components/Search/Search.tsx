@@ -22,11 +22,12 @@ const LabelText = styled.div`
 export const Search: FC = () => {
   const [searchParams, setSearchparams] = useSearchParams();
 
-  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const changeHandler: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setSearchparams({
       repoName: e.target.value,
     });
   };
+
   return (
     <Label>
       <LabelText>Введите название репозитория</LabelText>

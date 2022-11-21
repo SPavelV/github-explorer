@@ -28,10 +28,6 @@ type ListProps = {
 export const List: FC<ListProps> = ({ data = [] }) => {
   if (!data.length) return null;
 
-  const clickHandler = (id: string) => {
-    console.log("click id :>> ", id);
-  };
-
   return (
     <ListInner>
       {data.map(({ name, id, description, owner }: any) => {
@@ -40,9 +36,7 @@ export const List: FC<ListProps> = ({ data = [] }) => {
         return (
           <li key={id}>
             <h2>
-              <Link to={to} onClick={() => clickHandler(id)}>
-                {name}
-              </Link>
+              <Link to={to}>{name}</Link>
             </h2>
             <p>{description}</p>
           </li>

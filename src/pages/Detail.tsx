@@ -33,12 +33,7 @@ export const Detail = () => {
   const { owner, name } = useParams();
 
   useEffect(() => {
-    if (
-      setSearchValue &&
-      typeof setSearchValue === "function" &&
-      name &&
-      owner
-    ) {
+    if (typeof setSearchValue === "function" && name && owner) {
       setSearchValue(`${owner}/${name}`);
     }
   }, [name, owner, setSearchValue]);
@@ -60,32 +55,29 @@ export const Detail = () => {
   );
 
   const sortedLangs = useMemo(() => {
-    const result: { other: number; current: { [key: string]: string } } = {
-      current: {},
-      other: 0,
-    };
+    let result: { [key: string]: number } = {};
+    let other = 0;
 
     if (currentData?.langs) {
       for (let key of Object.keys(currentData.langs)) {
         const percent = (currentData.langs[key] / langSumBytes) * 100;
-        if (percent <= 0.1) result.other += percent;
-        else result.current[key] = percent.toFixed(1);
+        if (percent <= 0.1) other += percent;
+        else result[key] = percent;
       }
     }
 
-    return result;
+    return { ...result, other } as { [key: string]: number };
   }, [currentData?.langs, langSumBytes]);
 
   const listJSX = (
     <ListStyled>
-      {Object.keys(sortedLangs.current).map((key) => (
-        <LiStyled color={getColor(key)} key={key}>
-          {key}: {sortedLangs.current[key]}%
-        </LiStyled>
-      ))}
-      {sortedLangs.other && (
-        <LiStyled key="other">Other {sortedLangs.other.toFixed(1)} %</LiStyled>
-      )}
+      {Object.keys(sortedLangs).map((key) => {
+        return (
+          <LiStyled color={key === "other" ? "grey" : getColor(key)} key={key}>
+            {key}: {sortedLangs[key].toFixed(1)}%
+          </LiStyled>
+        );
+      })}
     </ListStyled>
   );
 
