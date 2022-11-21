@@ -13,11 +13,35 @@ export type RepoType = {
   stargazers_count: number;
 };
 
+export type ReadmeType = {
+  content: string;
+  download_url: string;
+  encoding: "base64";
+  git_url: string;
+  html_url: string;
+  name: "README.md";
+  path: "README.md";
+  sha: string;
+  size: number;
+  type: "file";
+};
+
+export type langsType = {
+  [key: string]: number;
+};
+
+export type DetailType = {
+  langs: langsType;
+  readme: ReadmeType;
+};
+
 export const useFetchData = (
   apiMethod: (searchText: string) => Promise<any>
 ) => {
   const [searchValue, setSearchValue] = useState<string>("");
-  const [data, setData] = useState<RepoType | RepoType[] | null>(null);
+  const [data, setData] = useState<RepoType | RepoType[] | DetailType | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 

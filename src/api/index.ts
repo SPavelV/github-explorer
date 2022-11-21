@@ -25,13 +25,21 @@ export const API = {
   },
   getDetail: async (name: string) => {
     try {
-      const response = await octokit.request({
-        method: "GET",
-        url: `/repos/${name}`,
-      });
-      if (response.status !== 200) throw new Error("Error fetching");
+      const [{ data: langs }, { data: readme }] = await Promise.all([
+        octokit.request({
+          method: "GET",
+          url: `/repos/${name}/languages`,
+        }),
 
-      return response.data;
+        octokit.request({
+          method: "GET",
+          url: `/repos/${name}/readme`,
+        }),
+      ]);
+
+      console.log("readme", readme);
+      console.log("langs", langs);
+      return { langs, readme: readme };
     } catch (error) {
       if (error instanceof Error) {
         console.error("error :>> ", error.message);

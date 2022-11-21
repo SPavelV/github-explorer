@@ -1,12 +1,34 @@
-import React, { useEffect } from "react";
-import { RepoType, useFetchData } from "../hooks/useFetchData";
+import React, { useEffect, useMemo } from "react";
+import { DetailType, useFetchData } from "../hooks/useFetchData";
 import { useParams } from "react-router";
 import { API } from "../api";
+import ReactMarkdown from "react-markdown";
+import styled from "styled-components";
+import { getColor } from "../utils/getColor";
+
+const ListStyled = styled.ul`
+  list-style: none;
+  margin: 8px 0 0 0;
+  padding: 0;
+`;
+
+const LiStyled = styled.li`
+  display: flex;
+  align-items: center;
+
+  ::before {
+    content: "•";
+    font-size: 30px;
+    color: ${(props) => props.color || "grey"};
+
+    margin-right: 8px;
+  }
+`;
 
 export const Detail = () => {
   const [data, isLoading, error, setSearchValue] = useFetchData(API.getDetail);
 
-  const currentData = data as RepoType;
+  const currentData = data as DetailType;
 
   const { owner, name } = useParams();
 
@@ -21,35 +43,67 @@ export const Detail = () => {
     }
   }, [name, owner, setSearchValue]);
 
+  const markDown = useMemo(
+    () =>
+      currentData?.readme?.content
+        ? window.atob(currentData.readme.content)
+        : "",
+    [currentData?.readme?.content]
+  );
+
+  const langSumBytes = useMemo(
+    () =>
+      currentData?.langs
+        ? Object.values(currentData.langs).reduce((sum, num) => (sum += num))
+        : 0,
+    [currentData?.langs]
+  );
+
+  const sortedLangs = useMemo(() => {
+    const result: { other: number; current: { [key: string]: string } } = {
+      current: {},
+      other: 0,
+    };
+
+    if (currentData?.langs) {
+      for (let key of Object.keys(currentData.langs)) {
+        const percent = (currentData.langs[key] / langSumBytes) * 100;
+        if (percent <= 0.1) result.other += percent;
+        else result.current[key] = percent.toFixed(1);
+      }
+    }
+
+    return result;
+  }, [currentData?.langs, langSumBytes]);
+
+  const listJSX = (
+    <ListStyled>
+      {Object.keys(sortedLangs.current).map((key) => (
+        <LiStyled color={getColor(key)} key={key}>
+          {key}: {sortedLangs.current[key]}%
+        </LiStyled>
+      ))}
+      {sortedLangs.other && (
+        <LiStyled key="other">Other {sortedLangs.other.toFixed(1)} %</LiStyled>
+      )}
+    </ListStyled>
+  );
+
   return (
     <div>
       {isLoading && <div>Loading...</div>}
       {error && <div>{error as string}</div>}
-      {currentData && (
+      {currentData?.langs && (
         <div>
-          {currentData.name && <h2>{currentData.name}</h2>}
-          {currentData && (
-            <ul>
-              {currentData.description && (
-                <li>
-                  <h3>Description</h3>
-                  <p>{currentData.description}</p>
-                </li>
-              )}
-              {currentData.size && (
-                <li>
-                  <h3>Size: </h3>
-                  <p>{currentData.size}</p>
-                </li>
-              )}
-              {currentData.stargazers_count && (
-                <li>
-                  <h3>Stargazers count: </h3>
-                  <p>{currentData.stargazers_count}</p>
-                </li>
-              )}
-            </ul>
-          )}
+          <i>Languages:</i>
+          {listJSX}
+        </div>
+      )}
+
+      {currentData?.readme && (
+        <div>
+          {currentData.readme.name && <h3>{currentData.readme.name}</h3>}
+          {currentData.readme.content && <ReactMarkdown children={markDown} />}
         </div>
       )}
     </div>
